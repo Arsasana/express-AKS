@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: "arsasanakubcluster-69d8"
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: "arsasanakubcluster-69d8"
+    spec:
+      containers:
+        - name: "arsasanakubcluster-69d8"
+          image: "rogoyalacr.azurecr.io/arsasanakubcluster"
+          ports:
+          - containerPort: 3000

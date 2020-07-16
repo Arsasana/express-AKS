@@ -1,0 +1,50 @@
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: arsasanaregistry.azurecr.io
+        username: ${{ secrets.acr_arsasanaregistry_username }}
+        password: ${{ secrets.acr_arsasanaregistry_password }}
+    
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        docker build "$GITHUB_WORKSPACE/" -f  "Dockerfile" -t arsasanaregistry.azurecr.io/arsasanakubcluster:${{ github.sha }}
+        docker push arsasanaregistry.azurecr.io/arsasanakubcluster:${{ github.sha }}
+    
+    - uses: azure/k8s-set-context@v1
+      with:
+         kubeconfig: ${{ secrets.aks_arsasanakubcluster_kubeConfig }}
+      id: login
+    
+    - name: Create namespace
+      run: |
+        namespacePresent=`kubectl get namespace | grep arsasanakubcluster9a1c | wc -l`
+        if [ $namespacePresent -eq 0 ]
+        then
+            echo `kubectl create namespace arsasanakubcluster9a1c`
+        fi
+
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: arsasanakubcluster9a1c
+        container-registry-url: arsasanaregistry.azurecr.io
+        container-registry-username: ${{ secrets.acr_arsasanaregistry_username }}
+        container-registry-password: ${{ secrets.acr_arsasanaregistry_password }}
+        secret-name: arsasanakubcdockerauth
+       
+    - uses: azure/k8s-deploy@v1
+      with:
+        namespace: arsasanakubcluster9a1c
+        manifests: |
+          manifests/deployment-5.yml
+          manifests/service-5.yml
+        images: |
+          arsasanaregistry.azurecr.io/arsasanakubcluster:${{ github.sha }}
+        imagepullsecrets: |
+          arsasanakubcdockerauth

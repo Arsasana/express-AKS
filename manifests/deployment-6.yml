@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: "arsasanakubcluster-ed1c"
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: "arsasanakubcluster-ed1c"
+    spec:
+      containers:
+        - name: "arsasanakubcluster-ed1c"
+          image: "arsasanaregistry.azurecr.io/arsasanakubcluster"
+          ports:
+          - containerPort: 3000

@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: "arsasanakubcluster-fdf3"
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: "arsasanakubcluster-fdf3"
+    spec:
+      containers:
+        - name: "arsasanakubcluster-fdf3"
+          image: "arsasanaregistry.azurecr.io/arsasanakubcluster"
+          ports:
+          - containerPort: 3000

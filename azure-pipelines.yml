@@ -34,15 +34,9 @@ stages:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
+        command: login
         containerRegistry: DockerHub
-        tags: |
-          $(tag)
-          
-    - upload: manifests
-      artifact: manifests
+
 
 # - stage: Deploy
 #   displayName: Deploy stage
